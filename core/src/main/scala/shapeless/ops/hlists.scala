@@ -17,8 +17,7 @@
 package shapeless
 package ops
 
-import scala.annotation.tailrec
-import scala.annotation.implicitNotFound
+import scala.annotation.{tailrec, implicitNotFound, inductive}
 import scala.collection.GenTraversableLike
 import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable
@@ -32,6 +31,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait IsHCons[L <: HList] extends Serializable {
     type H
     type T <: HList
@@ -57,6 +57,7 @@ object hlist {
   /**
    * Type class witnessing that the result of wrapping each element of `HList` `L` in type constructor `F` is `Out`.
    */
+  @inductive
   trait Mapped[L <: HList, F[_]] extends Serializable {
     type Out <: HList
   }
@@ -80,6 +81,7 @@ object hlist {
   /**
    * Type class witnessing that the result of stripping type constructor `F` off each element of `HList` `L` is `Out`.
    */
+  @inductive
   trait Comapped[L <: HList, F[_]] extends Serializable {
     type Out <: HList
   }
@@ -106,6 +108,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait NatTRel[L1 <: HList, F1[_], L2 <: HList, F2[_]] extends Serializable {
     def map(nt: F1 ~> F2, fa: L1): L2
   }
@@ -151,6 +154,7 @@ object hlist {
    * Type class providing minimally witnessed operations on `HList`s which can be derived from `L` by wrapping
    * each of its elements in a type constructor.
    */
+  @inductive
   trait HKernel {
     type L <: HList
     type Mapped[G[_]] <: HList
@@ -219,6 +223,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait ToCoproduct[L <: HList] extends Serializable { type Out <: Coproduct }
 
   object ToCoproduct {
@@ -248,6 +253,7 @@ object hlist {
       }
   }
 
+  @inductive
   trait ToSum[L <: HList] extends Serializable {
     type Out <: Coproduct
   }
@@ -275,6 +281,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait Length[L <: HList] extends DepFn0 with Serializable { type Out <: Nat }
 
   object Length {
@@ -298,6 +305,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait Mapper[HF, In <: HList] extends DepFn1[In] with Serializable { type Out <: HList }
 
   object Mapper {
@@ -324,6 +332,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait FlatMapper[HF, In <: HList] extends DepFn1[In] with Serializable { type Out <: HList }
 
   object FlatMapper {
@@ -354,6 +363,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait ConstMapper[C, L <: HList] extends DepFn2[C, L] with Serializable { type Out <: HList }
 
   object ConstMapper {
@@ -381,6 +391,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait MapFolder[L <: HList, R, HF] extends Serializable {
     def apply(l : L, in : R, op : (R, R) => R) : R
   }
@@ -404,6 +415,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait LeftFolder[L <: HList, In, HF] extends DepFn2[L, In] with Serializable
 
   object LeftFolder {
@@ -430,6 +442,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait RightFolder[L <: HList, In, HF] extends DepFn2[L, In] with Serializable
 
   object RightFolder {
@@ -456,6 +469,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait LeftReducer[L <: HList, HF] extends DepFn1[L] with Serializable
 
   object LeftReducer {
@@ -474,6 +488,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait RightReducer[L <: HList, HF] extends DepFn1[L] with Serializable
 
   object RightReducer {
@@ -500,6 +515,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait Unifier[L <: HList] extends DepFn1[L] with Serializable { type Out <: HList }
 
   object Unifier {
@@ -532,6 +548,7 @@ object hlist {
    *
    * @author Travis Brown
    */
+  @inductive
   trait SubtypeUnifier[L <: HList, B] extends DepFn1[L] with Serializable { type Out <: HList }
 
   object SubtypeUnifier {
@@ -571,6 +588,7 @@ object hlist {
    *
    * @author Alexandre Archambault
    */
+  @inductive
   trait ToTraversable[L <: HList, M[_]] extends DepFn1[L] with Serializable {
     type Lub
     def builder(): mutable.Builder[Lub, M[Lub]]
@@ -632,6 +650,7 @@ object hlist {
     *
     * @author Valentin Kasas
     */
+  @inductive
   trait ToCoproductTraversable[L <: HList, M[_]] extends DepFn1[L] with Serializable {
     type Cop <: Coproduct
     type Out = M[Cop]
@@ -718,6 +737,7 @@ object hlist {
    *
    * @author Alexandre Archambault
    */
+  @inductive
   trait ToSized[L <: HList, M[_]] extends DepFn1[L] with Serializable {
     type Lub
     type N <: Nat
@@ -773,6 +793,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait Tupler[L <: HList] extends DepFn1[L] with Serializable
 
   object Tupler extends TuplerInstances {
@@ -792,6 +813,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.Last[${L}]. ${L} is empty, so there is no last element.")
+  @inductive
   trait Last[L <: HList] extends DepFn1[L] with Serializable
 
   object Last {
@@ -820,6 +842,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.Init[${L}]. {L} is empty, so there is no first element.")
+  @inductive
   trait Init[L <: HList] extends DepFn1[L] with Serializable { type Out <: HList }
 
   object Init {
@@ -848,6 +871,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.Selector[${L}, ${U}]. You requested an element of type ${U}, but there is none in the HList ${L}.")
+  @inductive
   trait Selector[L <: HList, U] extends DepFn1[L] with Serializable { type Out = U }
 
   object Selector {
@@ -874,6 +898,7 @@ object hlist {
     * @author Ievgen Garkusha
     */
   @annotation.implicitNotFound(msg = "Field types set of ${S} is not fully contained in type definition of ${L}")
+  @inductive
   trait SelectAll[L <: HList, S <: HList] extends DepFn1[L] with Serializable { type Out = S }
 
   object SelectAll {
@@ -897,6 +922,7 @@ object hlist {
    * @author Andreas Koestler
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.SelectMany[${L}, ${Ids}]. You requested the elements in ${Ids}, but HList ${L} does not contain all of them.")
+  @inductive
   trait SelectMany[L <: HList, Ids <: HList] extends DepFn1[L] { type Out <: HList }
 
   object SelectMany {
@@ -925,6 +951,7 @@ object hlist {
    * @author Andreas Koestler
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.SelectRange[${L}, ${A}, ${B}]. You requested the elements in range [${A},${B}[, but HList ${L} does not contain all of them.")
+  @inductive
   trait SelectRange[L <: HList, A <: Nat, B <: Nat] extends DepFn1[L] { type Out <: HList }
 
   object SelectRange {
@@ -949,6 +976,7 @@ object hlist {
    *
    * @author Stacy Curl
    */
+  @inductive
   trait Partition[L <: HList, U] extends DepFn1[L] with Serializable {
     type Prefix <: HList
     type Suffix <: HList
@@ -1005,7 +1033,8 @@ object hlist {
   *
   * @author Andreas Koestler
   */
- trait Grouper[L <: HList, N <: Nat, Step <: Nat] extends DepFn1[L] with Serializable {
+  @inductive
+  trait Grouper[L <: HList, N <: Nat, Step <: Nat] extends DepFn1[L] with Serializable {
     type Out <: HList
   }
 
@@ -1091,6 +1120,7 @@ object hlist {
 
   }
 
+  @inductive
   trait PaddedGrouper[L <: HList, N <: Nat, Step <: Nat, Pad <: HList] extends DepFn2[L, Pad] with Serializable {
     type Out <: HList
   }
@@ -1125,6 +1155,7 @@ object hlist {
    *
    * @author Alois Cochard
    */
+  @inductive
   trait Filter[L <: HList, U] extends DepFn1[L] with Serializable { type Out <: HList }
 
   object Filter {
@@ -1146,6 +1177,7 @@ object hlist {
    *
    * @author Alois Cochard
    */
+  @inductive
   trait FilterNot[L <: HList, U] extends DepFn1[L] with Serializable { type Out <: HList }
 
   object FilterNot {
@@ -1169,6 +1201,7 @@ object hlist {
    * @author Stacy Curl
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.Remove[${L}, ${E}]. You requested to remove an element of type ${E}, but there is no unique candidate in the HList ${L}.")
+  @inductive
   trait Remove[L <: HList, E] extends DepFn1[L] with Serializable {
     def reinsert(out: Out): L
   }
@@ -1209,6 +1242,7 @@ object hlist {
    * @author Stacy Curl
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.RemoveAll[${L}, ${SL}]. You requested to remove elements of the types ${SL}, but not all were found in HList ${L}.")
+  @inductive
   trait RemoveAll[L <: HList, SL <: HList] extends DepFn1[L] with Serializable {
     def reinsert(out: Out): L
   }
@@ -1248,6 +1282,7 @@ object hlist {
    *
    * @author Olivier Blanvillain
    */
+  @inductive
   trait Union[L <: HList, M <: HList] extends DepFn2[L, M] with Serializable { type Out <: HList }
 
   trait LowPriorityUnion {
@@ -1305,6 +1340,7 @@ object hlist {
    *
    * @author Olivier Blanvillain
    */
+  @inductive
   trait Intersection[L <: HList, M <: HList] extends DepFn1[L] with Serializable { type Out <: HList }
 
   trait LowPriorityIntersection {
@@ -1362,6 +1398,7 @@ object hlist {
    *
    * @author Olivier Blanvillain
    */
+  @inductive
   trait Diff[L <: HList, M <: HList] extends DepFn1[L] with Serializable { type Out <: HList }
 
   trait LowPriorityDiff {
@@ -1402,6 +1439,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.Replacer[${L}, ${U}, ${V}]. You requested to replace an element of the type ${U}, but there is none in HList ${L}.")
+  @inductive
   trait Replacer[L <: HList, U, V] extends DepFn2[L, V] with Serializable
 
   object Replacer {
@@ -1434,6 +1472,7 @@ object hlist {
    * @author Jules Gosnell
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.Modifier[${L}, ${U}, ${V}]. You requested to modify an element of the type ${U}, but there is none in HList ${L}.")
+  @inductive
   trait Modifier[L <: HList, U, V] extends DepFn2[L, U => V] with Serializable
 
   object Modifier {
@@ -1466,6 +1505,7 @@ object hlist {
    *
    * @author Andreas Koestler
    */
+  @inductive
   trait ModifierAt[L <: HList, N <: Nat, U, V] extends DepFn2[L, U => V]
 
   object ModifierAt {
@@ -1497,6 +1537,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.ReplaceAt[${L}, ${N}, ${V}]. You requested to modify an element at the position ${N}, but the HList ${L} is too short.")
+  @inductive
   trait ReplaceAt[L <: HList, N <: Nat, V] extends DepFn2[L, V] with Serializable
 
   object ReplaceAt {
@@ -1528,6 +1569,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.At[${L}, ${N}]. You requested to access an element at the position ${N}, but the HList ${L} is too short.")
+  @inductive
   trait At[L <: HList, N <: Nat] extends DepFn1[L] with Serializable
 
   object At {
@@ -1556,6 +1598,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.Drop[${L}, ${N}]. You requested to drop an element at the position ${N}, but the HList ${L} is too short.")
+  @inductive
   trait Drop[L <: HList, N <: Nat] extends DepFn1[L] with Serializable { type Out <: HList }
 
   object Drop {
@@ -1584,6 +1627,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.Take[${L}, ${N}]. You requested to take ${N} elements, but the HList ${L} is too short.")
+  @inductive
   trait Take[L <: HList, N <: Nat] extends DepFn1[L] with Serializable { type Out <: HList }
 
   object Take {
@@ -1613,6 +1657,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.Split[${L}, ${N}]. You requested to split at position ${N}, but the HList ${L} is too short.")
+  @inductive
   trait Split[L <: HList, N <: Nat] extends DepFn1[L] with Serializable {
     type Prefix <: HList
     type Suffix <: HList
@@ -1666,6 +1711,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.ReverseSplit[${L}, ${N}]. You requested to split at position ${N}, but the HList ${L} is too short.")
+  @inductive
   trait ReverseSplit[L <: HList, N <: Nat] extends DepFn1[L] with Serializable {
     type Prefix <: HList
     type Suffix <: HList
@@ -1717,6 +1763,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.SplitLeft[${L}, ${U}]. You requested to split at an element of type ${U}, but there is none in the HList ${L}.")
+  @inductive
   trait SplitLeft[L <: HList, U] extends DepFn1[L] with Serializable {
     type Prefix <: HList
     type Suffix <: HList
@@ -1773,6 +1820,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.ReverseSplitLeft[${L}, ${U}]. You requested to split at an element of type ${U}, but there is none in the HList ${L}.")
+  @inductive
   trait ReverseSplitLeft[L <: HList, U] extends DepFn1[L] with Serializable {
     type Prefix <: HList
     type Suffix <: HList
@@ -1826,6 +1874,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.SplitRight[${L}, ${U}]. You requested to split at an element of type ${U}, but there is none in the HList ${L}.")
+  @inductive
   trait SplitRight[L <: HList, U] extends DepFn1[L] with Serializable {
     type Prefix <: HList
     type Suffix <: HList
@@ -1885,6 +1934,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.ReverseSplitRight[${L}, ${U}]. You requested to split at an element of type ${U}, but there is none in the HList ${L}.")
+  @inductive
   trait ReverseSplitRight[L <: HList, U] extends DepFn1[L] with Serializable {
     type Prefix <: HList
     type Suffix <: HList
@@ -1941,6 +1991,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait Reverse[L <: HList] extends DepFn1[L] with Serializable { type Out <: HList }
 
   object Reverse {
@@ -1978,6 +2029,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait Align[L <: HList, M <: HList] extends (L => M) with Serializable {
     def apply(l: L): M
   }
@@ -2003,6 +2055,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait Prepend[P <: HList, S <: HList] extends DepFn2[P, S] with Serializable { type Out <: HList }
 
   trait LowestPriorityPrepend {
@@ -2045,6 +2098,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait ReversePrepend[P <: HList, S <: HList] extends DepFn2[P, S] with Serializable { type Out <: HList }
 
   trait LowPriorityReversePrepend {
@@ -2081,6 +2135,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait ZipOne[H <: HList, T <: HList] extends DepFn2[H, T] with Serializable { type Out <: HList }
 
   object ZipOne {
@@ -2119,6 +2174,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait Transposer[L <: HList] extends DepFn1[L] with Serializable { type Out <: HList }
 
   object Transposer {
@@ -2152,6 +2208,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait Zip[L <: HList] extends DepFn1[L] with Serializable { type Out <: HList }
 
   object Zip {
@@ -2174,6 +2231,7 @@ object hlist {
    *
    * @author Miles Sabin
    */
+  @inductive
   trait Unzip[L <: HList] extends DepFn1[L] with Serializable
 
   object Unzip {
@@ -2200,6 +2258,7 @@ object hlist {
    * @author Miles Sabin
    */
   @implicitNotFound("Implicit not found: shapeless.Ops.ZipApply[${FL}, ${AL}]. The types of ${FL} and ${AL} are not compatible.")
+  @inductive
   trait ZipApply[FL <: HList, AL <: HList] extends DepFn2[FL, AL] with Serializable { type Out <: HList }
 
   object ZipApply {
@@ -2227,6 +2286,7 @@ object hlist {
    *
    * @author Cody Allen
    */
+  @inductive
   trait ZipConst[C, L <: HList] extends DepFn2[C, L] with Serializable { type Out <: HList }
 
   object ZipConst {
@@ -2254,6 +2314,7 @@ object hlist {
    *
    * @author Stacy Curl
    */
+  @inductive
   trait ZipWith[L <: HList, R <: HList, P <: Poly2] extends DepFn2[L, R] with Serializable { type Out <: HList }
 
   object ZipWith {
@@ -2287,6 +2348,7 @@ object hlist {
    *
    * @author Cody Allen
    */
+  @inductive
   trait ZipWithKeys[K <: HList, V <: HList] extends DepFn1[V] with Serializable { type Out <: HList }
 
   object ZipWithKeys {
@@ -2318,6 +2380,7 @@ object hlist {
    * @author Andreas Koestler
    * @author Alexandre Archambault
    */
+  @inductive
   trait ZipWithIndex[L <: HList] extends DepFn1[L] with Serializable {
     type Out <: HList
   }
@@ -2368,6 +2431,7 @@ object hlist {
    *
    * @author Stacy Curl
    */
+  @inductive
   trait Collect[I <: HList, P <: Poly] extends DepFn1[I] with Serializable { type Out <: HList }
 
   object Collect extends LowPriorityCollect {
@@ -2421,6 +2485,7 @@ object hlist {
    *
    * @author Stacy Curl
    */
+  @inductive
   trait MapCons[A, M <: HList] extends DepFn2[A, M] with Serializable { type Out <: HList }
 
   object MapCons {
@@ -2449,6 +2514,7 @@ object hlist {
    *
    * @author Stacy Curl
    */
+  @inductive
   trait Interleave[A, L <: HList] extends DepFn2[A, L] with Serializable { type Out <: HList }
 
   object Interleave {
@@ -2477,6 +2543,7 @@ object hlist {
    *
    * @author Stacy Curl
    */
+  @inductive
   trait FlatMapInterleave[A, M <: HList] extends DepFn2[A, M] with Serializable { type Out <: HList }
 
   object FlatMapInterleave {
@@ -2510,6 +2577,7 @@ object hlist {
    *
    * @author Stacy Curl
    */
+  @inductive
   trait Permutations[L <: HList] extends DepFn1[L] with Serializable { type Out <: HList }
 
   object Permutations {
@@ -2538,6 +2606,7 @@ object hlist {
    *
    * @author Stacy Curl
    */
+  @inductive
   trait RotateLeft[L <: HList, N <: Nat] extends DepFn1[L] with Serializable { type Out <: HList }
 
   object RotateLeft extends LowPriorityRotateLeft {
@@ -2582,6 +2651,7 @@ object hlist {
    *
    * @author Stacy Curl
    */
+  @inductive
   trait RotateRight[L <: HList, N <: Nat] extends DepFn1[L] with Serializable { type Out <: HList }
 
   object RotateRight extends LowPriorityRotateRight {
@@ -2621,6 +2691,7 @@ object hlist {
    *
    * @author Owein Reese
    */
+  @inductive
   trait LeftScanner[L <: HList, In, P <: Poly] extends DepFn2[L, In] with Serializable {
     type Out <: HList
   }
@@ -2651,6 +2722,7 @@ object hlist {
    *
    * @author Owein Reese
    */
+  @inductive
   trait RightScanner[L <: HList, In, P <: Poly] extends DepFn2[L, In] with Serializable {
     type Out <: HList
   }
@@ -2692,6 +2764,7 @@ object hlist {
    *
    * @author Alexandre Archambault
    */
+  @inductive
   trait Fill[N, A] extends DepFn1[A] with Serializable { type Out <: HList }
 
   object Fill {
@@ -2725,6 +2798,7 @@ object hlist {
     *
     * @author 杨博 (Yang Bo)
     */
+  @inductive
   trait FillWith[F, L <: HList] extends DepFn0 with Serializable {
     type Out = L
   }
@@ -2749,6 +2823,7 @@ object hlist {
    *
    * @author Owein Reese
    */
+  @inductive
   trait Patcher[N <: Nat, M <: Nat, L <: HList, In <: HList] extends DepFn2[L, In] with Serializable {
     type Out <: HList
   }
@@ -2781,6 +2856,7 @@ object hlist {
    *
    * @author Owein Reese
    */
+  @inductive
   trait CollectFirst[L <: HList, P <: Poly] extends DepFn1[L] with Serializable
 
   object CollectFirst extends LowPriorityCollectFirst{
@@ -2814,6 +2890,7 @@ object hlist {
    *
    * @author Tin Pavlinic
   */
+  @inductive
   sealed trait LiftAll[F[_], In <: HList] {
     type Out <: HList
     def instances: Out
@@ -2844,6 +2921,7 @@ object hlist {
    *
    * @author ryoppy
    */
+  @inductive
   trait PadTo[N, A, L <: HList] extends DepFn2[A, L] with Serializable { type Out <: HList }
 
   object PadTo {
@@ -2875,6 +2953,7 @@ object hlist {
    *
    * @author ryoppy
    */
+  @inductive
   trait Slice[N, U, L <: HList] extends DepFn1[L] with Serializable { type Out <: HList }
 
   object Slice {
@@ -2908,6 +2987,7 @@ object hlist {
     *
     * @author Jisoo Park
     */
+  @inductive
   trait Reify[L <: HList] extends DepFn0 with Serializable { type Out <: HList }
 
   object Reify {
@@ -2936,6 +3016,7 @@ object hlist {
    *
    * @author ryoppy
    */
+  @inductive
   trait Combinations[N <: Nat, L <: HList] extends DepFn1[L] with Serializable {
     type Out <: HList
   }
